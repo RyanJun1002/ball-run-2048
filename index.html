@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#bdebf3" />
+    <meta
+      name="description"
+      content="공을 합치고, 장애물을 피해 2048에 도전하는 3D 러너 게임"
+    />
+    <title>Ball Run 2048 · 물 위의 숫자 여행</title>
+  </head>
+  <body>
+    <main id="game" aria-label="Ball Run 2048 게임">
+      <div id="scene"></div>
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Ball Run 2048 처음으로"
+          ><span class="brand-orb">2</span
+          ><span
+            >BALL RUN <b>2048</b><small>작은 공, 큰 가능성.</small></span
+          ></a
+        >
+        <div class="progress-cluster">
+          <span id="stage"
+            ><b>STAGE 01</b><i> / </i
+            ><span class="stage-name">AQUA RUN</span></span
+          >
+          <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="트랙 진행률"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
+            <span id="progress"></span>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button
+            id="sound"
+            class="icon-button"
+            aria-label="소리 켜기"
+            aria-pressed="false"
+          >
+            ♪
+          </button>
+          <button
+            id="settings-button"
+            class="icon-button"
+            aria-label="게임 설정"
+          >
+            ⚙
+          </button>
+          <button
+            id="pause"
+            class="icon-button"
+            aria-label="일시 정지"
+            disabled
+          >
+            Ⅱ
+          </button>
+        </div>
+      </header>
+      <aside class="score-chip">
+        <span class="score-dot"></span>
+        <div><small>현재 숫자</small><strong id="value">16</strong></div>
+        <span class="score-separator"></span>
+        <div><small id="goal-label">목표</small><b id="goal">2048</b></div>
+      </aside>
+      <div class="best-chip">
+        <span id="best-label">BEST</span><strong id="best">—</strong>
+      </div>
+      <div id="run-stats" class="run-stats" hidden>
+        <span id="distance">0 m</span><i>·</i><span id="speed">0 km/h</span>
+      </div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <section id="intro" class="start-panel">
+        <span class="eyebrow"><span></span> MERGE. ROLL. REPEAT.</span>
+        <h1>굴릴수록, <em>더 크게.</em></h1>
+        <p>굴러서 만나고, 합쳐서 커지는 숫자 여행.</p>
+        <div class="mode-picker" role="group" aria-label="게임 모드">
+          <button id="normal-mode" aria-pressed="true">
+            <b>일반 모드</b><small>6개의 스테이지</small></button
+          ><button id="endless-mode" aria-pressed="false">
+            <b>∞ 무한 모드</b><small>나의 한계 너머로</small>
+          </button>
+        </div>
+        <button id="stage-select" class="stage-select">
+          <span
+            ><small id="selected-stage-number">STAGE 01</small
+            ><b id="selected-stage-name">아쿠아 산책</b></span
+          ><span>변경 ↗</span>
+        </button>
+        <p id="mode-description" class="mode-description">
+          같은 숫자를 차례로 모아보세요
+        </p>
+        <button id="start" class="primary">굴리기 시작 <span>→</span></button>
+        <div class="control-hint">
+          <span class="drag-symbol">↔</span> 드래그로 이동 <i></i> <kbd>←</kbd
+          ><kbd>→</kbd> 방향키
+        </div>
+      </section>
+      <div id="playing-hint" class="playing-hint" hidden>
+        같은 숫자는 두 배 · 무지개 공은 언제나 ×2
+      </div>
+      <footer class="footnote">
+        <span>물 위의 숫자 여행</span><span>ROLL A LITTLE. GROW A LOT.</span>
+      </footer>
+      <dialog
+        id="stages"
+        class="modal stages-modal"
+        aria-labelledby="stages-title"
+      >
+        <form method="dialog">
+          <button class="close-button" aria-label="스테이지 선택 닫기">
+            ×
+          </button>
+        </form>
+        <span class="eyebrow">YOUR NEXT ADVENTURE</span>
+        <h2 id="stages-title">어디로 굴러갈까요?</h2>
+        <p>앞 스테이지를 완료하면 다음 길이 열립니다.</p>
+        <div id="stage-grid" class="stage-grid"></div>
+      </dialog>
+      <dialog id="settings" class="modal" aria-labelledby="settings-title">
+        <form method="dialog">
+          <button class="close-button" aria-label="설정 닫기">×</button>
+        </form>
+        <span class="eyebrow">MAKE IT YOURS</span>
+        <h2 id="settings-title">내 방식대로 굴리기</h2>
+        <label class="toggle-row" for="effects"
+          ><span>효과음<small>굴러가는 소리, 합치기, 점프와 충돌</small></span
+          ><input id="effects" type="checkbox" checked
+        /></label>
+        <label for="volume">음량 <span id="volume-label">65%</span></label
+        ><input id="volume" type="range" min="0" max="100" value="65" />
+        <label class="toggle-row" for="eyes"
+          ><span
+            >공에 작은 눈 달기<small
+              >숫자 친구들에게 표정을 더해요.</small
+            ></span
+          ><input id="eyes" type="checkbox"
+        /></label>
+        <label class="toggle-row" for="motion"
+          ><span
+            >차분한 효과<small>카메라 흔들림과 입자 효과를 줄여요.</small></span
+          ><input id="motion" type="checkbox"
+        /></label>
+        <p class="settings-note">
+          같은 숫자·무지개 공은 두 배, 다른 숫자는 튕겨 나갑니다.<br />스파이크와
+          기둥에 닿으면 절반, 가장자리를 넘으면 바다로 추락합니다.<br />노란
+          발판에서는 자동으로 점프합니다.
+        </p>
+      </dialog>
+      <dialog
+        id="result"
+        class="modal result-modal"
+        aria-labelledby="result-title"
+      >
+        <span id="result-tag" class="eyebrow">NICE RUN!</span>
+        <div id="result-value" class="result-ball">2048</div>
+        <div id="result-stars" class="result-stars"></div>
+        <h2 id="result-title">2048 달성!</h2>
+        <p id="result-copy"></p>
+        <button id="next-stage" class="primary" hidden>
+          다음 스테이지 <span>→</span></button
+        ><button id="again" class="primary">다시 굴리기 <span>↗</span></button
+        ><button id="home" class="text-button">모드 선택으로</button>
+      </dialog>
+      <dialog id="paused" class="modal" aria-labelledby="pause-title">
+        <span class="eyebrow">TAKE A BREATHER</span>
+        <h2 id="pause-title">잠깐 쉬어가요.</h2>
+        <p>트랙은 여기서 기다릴게요.</p>
+        <button id="resume" class="primary">계속 플레이 <span>→</span></button
+        ><button id="restart" class="text-button">처음부터 다시</button
+        ><button id="pause-home" class="text-button">모드 선택으로</button>
+      </dialog>
+      <section id="error" class="error-panel" hidden>
+        <h2>게임 화면을 불러오지 못했어요.</h2>
+        <p id="error-copy">WebGL을 지원하는 브라우저에서 다시 열어주세요.</p>
+        <button class="primary" onclick="location.reload()">다시 시도</button>
+      </section>
+      <div id="loading" class="loading">트랙 준비 중<span>•••</span></div>
+      <noscript>이 게임을 플레이하려면 JavaScript를 켜주세요.</noscript>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

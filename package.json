@@ -1,0 +1,24 @@
+{
+  "name": "ball-run-2048",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "preview": "vite preview --host 127.0.0.1",
+    "format:check": "prettier --check src tests index.html vite.config.js package.json tsconfig.json README.md"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "three": "0.179.1"
+  },
+  "devDependencies": {
+    "@types/three": "0.179.0",
+    "prettier": "3.9.9",
+    "tsx": "4.20.6",
+    "typescript": "5.9.2",
+    "vite": "7.3.6"
+  }
+}

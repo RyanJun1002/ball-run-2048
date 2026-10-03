@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.local
+.runtime/
+.env
+.env.*
+preview*.png
